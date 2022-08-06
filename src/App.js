@@ -1,23 +1,40 @@
-import logo from './logo.svg';
 import './App.css';
+import {Routes, Route} from 'react-router-dom'
+import Posts from './components/Posts/Posts';
+import Post from './components/Posts/Post/Post';
+import NewPost from './components/Posts/NewPost/NewPost';
+import EditPost from './components/Posts/EditPost/EditPost';
 
 function App() {
+  const publishPost = async (id, text) => {
+    await fetch('http://localhost:7777/posts', {method:'POST', headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({id: id, content: text, action: 'publish'})})
+  }
+  const editPost = async (id, text) => {
+    await fetch('http://localhost:7777/posts', {method:'POST', headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({id: id, content: text, action: 'edit'})})
+  }
+  const deletePost = async (id, text) => {
+    await fetch(`http://localhost:7777/posts/${id}`, {method:'DELETE', headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({id: id, content: text})})
+  }
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Routes>
+        <Route path="/" exact element={<Posts />} />
+        <Route path="/posts/:id" exact element={<Post delete={deletePost}/>} />
+        <Route path="/posts/edit/:id" exact element={<EditPost edit={editPost}/>} />
+        <Route path="/posts/new" exact element={<NewPost publish={publishPost}/>} />
+      </Routes>
     </div>
   );
 }
